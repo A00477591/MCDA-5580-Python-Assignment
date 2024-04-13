@@ -24,8 +24,8 @@ def main():
         else:
             st.error("Error while fetching the valid coins list from API. Please try again.")
 
-# if __name__=='__main__':
-#     main()
+if __name__=='__main__':
+    main()
 
-datetimeStr=datetime.fromtimestamp(float("1681516800000")/1000)
-print(datetimeStr.strftime('%Y-%m'))
+# datetimeStr=datetime.fromtimestamp(float("1681516800000")/1000)
+# print(datetimeStr.strftime('%Y-%m'))
