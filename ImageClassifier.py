@@ -1,31 +1,36 @@
 import streamlit as st
-import requests
-import json
-from datetime import datetime
+from PIL import Image
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+
+model = keras.models.load_model('digit_classifier_model.h5')
+
+def preprocess_image(image):
+    grayscale_image = image.convert('L')
+    resized_image = grayscale_image.resize((28, 28))
+    image_array = np.array(resized_image)
+    normalized_image = image_array / 255.0
+    input_image = normalized_image.reshape((1, 28, 28, 1))
+    return input_image
+
+def make_prediction(image):
+    input_image = preprocess_image(image)
+    prediction = model.predict(input_image)
+    predicted_class = np.argmax(prediction)
+    return predicted_class
 
 def main():
-    st.title("Stock Details App")
-    userInput=st.text_input("Enter a cryptocurrency:")
-    if userInput:
-        coinsListResponse=requests.get("https://api.coingecko.com/api/v3/coins/list")
-        if coinsListResponse.status_code==200:
-            jsonResponse=coinsListResponse.json()
-            cryptocurrencies=[crypto['name'] for crypto in jsonResponse]
-            if any(userInput.lower()==cryptocurrency.lower() for cryptocurrency in cryptocurrencies):
-                #Plot the coins price over the last year
-                historicalRatesResponse=requests.get("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=CAD&days=365&precision=2")
-                if historicalRatesResponse.status_code==200:
-                    prices=historicalRatesResponse.json()['prices']
-                    print(datetime.fromtimestamp(float("1681430400000")).strftime('%Y-%m %H:%M:%S'))
-                else:
-                    st.error("Error while fetching the historical prices of the cryptocurrency. Please try again.")
-            else:
-                st.error("Invalid cryptocurrency!")
-        else:
-            st.error("Error while fetching the valid coins list from API. Please try again.")
+    st.title('Digit Classifier App')
+    st.write('Upload an image of a digit to classify it.')
 
-if __name__=='__main__':
+    uploaded_file = st.file_uploader('Choose an image...', type=['jpg', 'jpeg', 'png'])
+
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file)
+        st.image(image, caption='Uploaded Image', use_column_width=True)
+        predicted_digit = make_prediction(image)
+        st.write(f'Predicted Digit: {predicted_digit}')
+
+if __name__ == '__main__':
     main()
-
-# datetimeStr=datetime.fromtimestamp(float("1681516800000")/1000)
-# print(datetimeStr.strftime('%Y-%m'))
