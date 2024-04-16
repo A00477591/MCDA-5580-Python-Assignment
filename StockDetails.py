@@ -14,7 +14,6 @@ def main():
             cryptocurrencies=[(crypto['id'],crypto['name']) for crypto in jsonResponse]
             crypto=next((cryptocurrency for cryptocurrency in cryptocurrencies if userInput.lower()==cryptocurrency[1].lower()),None)
             if crypto:
-                print(crypto)
                 #Plot the coins price over the last year
                 historicalRatesResponse=requests.get(f"https://api.coingecko.com/api/v3/coins/{crypto[0]}/market_chart?vs_currency=CAD&days=365&precision=2")
                 if historicalRatesResponse.status_code==200:
